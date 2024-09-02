@@ -4,7 +4,7 @@ const initialState = {
   mode: "light",
   user: null,
   token: null,
-  posts: [],
+  posts:[],
 };
 
 export const authSlice = createSlice({
@@ -30,7 +30,7 @@ export const authSlice = createSlice({
       }
     },
     setPosts: (state, action) => {
-      state.posts = action.payload.posts;
+      state.posts = action.payload.posts;  // Ensure this sets an array
     },
     setPost: (state, action) => {
         const updatedPosts = state.posts.map((post) =>{
