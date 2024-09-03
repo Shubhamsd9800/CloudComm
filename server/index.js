@@ -1,81 +1,77 @@
-import express from "express"
-import bodyParser from "body-parser"
-import mongoose, { mongo } from "mongoose"
-import cors from "cors"
-import dotenv from "dotenv"
-import multer from "multer"
-import helmet from "helmet"
-import morgan from "morgan"
-import path from "path"
-import { fileURLToPath } from "url"
-import { error } from "console"
-import authRoutes from "./routes/auth.js"
-import userRoutes from "./routes/users.js"
-import postRoutes from "./routes/posts.js"
-import {createPost} from "./controllers/posts.js"
-import { register } from "./controllers/auth.js"
-import { verifyToken } from "./middleware/auth.js"
-import User from "./models/User.js"
-import Post from "./models/Post.js"
-import {users,posts} from "./data/index.js"
+import express from "express";
+import bodyParser from "body-parser";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv";
+import multer from "multer";
+import helmet from "helmet";
+import morgan from "morgan";
+import path from "path";
+import { fileURLToPath } from "url";
+import authRoutes from "./routes/auth.js";
+import userRoutes from "./routes/users.js";
+import postRoutes from "./routes/posts.js";
+import { createPost } from "./controllers/posts.js";
+import { register } from "./controllers/auth.js";
+import { verifyToken } from "./middleware/auth.js";
+import User from "./models/User.js";
+import Post from "./models/Post.js";
+import { users, posts } from "./data/index.js";
 
 // CONFIGURATIONS
-const __filename=fileURLToPath(import.meta.url);
-const __dirname=path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 dotenv.config();
-const app=express();
+const app = express();
 app.use(express.json());
 app.use(helmet());
-app.use(helmet.crossOriginResourcePolicy({policy: "cross-origin"}));
+app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("common"));
-app.use(bodyParser.json({limit:"30mb", extented: true}))
-app.use(bodyParser.urlencoded({limit: "30mb", extended: true}));
+app.use(bodyParser.json({ limit: "30mb", extended: true }));
+app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 
+// CORS Configuration
 app.use(cors({
-    origin: "https://cloud-comm.vercel.app", // The origin of your frontend
-    credentials: true,
-  }));
-app.use("/assets",express.static(path.join(__dirname, "public/assets")));
+  origin: "https://cloud-comm.vercel.app", // The origin of your frontend
+  methods: ["GET", "POST", "PATCH", "PUT", "DELETE"], // Allowed methods
+  allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+  credentials: true, // Allow credentials
+}));
 
+app.options('*', cors()); // Enable pre-flight across all routes
+
+app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
 // FILE STORAGE
-
-const storage=multer.diskStorage({
-    destination: function (req,file,cb){
-        cb(null,"public/assets");
-    },
-    filename:function(req,file,cb){
-        cb(null,file.originalname);
-    }
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/assets");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  }
 });
-
-const upload =multer({storage});
-
+const upload = multer({ storage });
 
 // ROUTES WITH FILES
-app.post("/auth/register",upload.single("picture"),register);
-app.post("/posts",verifyToken,upload.single("picture"),createPost)
+app.post("/auth/register", upload.single("picture"), register);
+app.post("/posts", verifyToken, upload.single("picture"), createPost);
 
-//ROUTES
+// ROUTES
 app.use("/auth", authRoutes);
-app.use("/users",userRoutes);
-app.use("/posts",postRoutes);
-
+app.use("/users", userRoutes);
+app.use("/posts", postRoutes);
 
 // ERROR HANDLING MIDDLEWARE
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ message: "Internal Server Error", error: err.message });
-  });
-
+  console.error(err.stack);
+  res.status(500).json({ message: "Internal Server Error", error: err.message });
+});
 
 // MONGOOSE SETUP
-const PORT=process.env.PORT||6001;
-mongoose.connect(process.env.MONGO_URL).then(()=>{
-    app.listen(PORT,()=>console.log(`Server connected at ${PORT}`));
-    
-    // User.insertMany(users);
-    // Post.insertMany(posts);
-}).catch((error)=>console.log(`${error} did not connect`))
-
-
+const PORT = process.env.PORT || 6001;
+mongoose.connect(process.env.MONGO_URL).then(() => {
+  app.listen(PORT, () => console.log(`Server connected at ${PORT}`));
+  // User.insertMany(users);
+  // Post.insertMany(posts);
+}).catch((error) => console.log(`${error} did not connect`));
