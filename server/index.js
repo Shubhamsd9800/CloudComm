@@ -30,6 +30,7 @@ app.use(helmet.crossOriginResourcePolicy({policy: "cross-origin"}));
 app.use(morgan("common"));
 app.use(bodyParser.json({limit:"30mb", extented: true}))
 app.use(bodyParser.urlencoded({limit: "30mb", extended: true}));
+
 app.use(cors({
     origin: "https://cloud-comm.vercel.app", // The origin of your frontend
     credentials: true,
@@ -59,6 +60,15 @@ app.post("/posts",verifyToken,upload.single("picture"),createPost)
 app.use("/auth", authRoutes);
 app.use("/users",userRoutes);
 app.use("/posts",postRoutes);
+
+
+// ERROR HANDLING MIDDLEWARE
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: "Internal Server Error", error: err.message });
+  });
+
+
 // MONGOOSE SETUP
 const PORT=process.env.PORT||6001;
 mongoose.connect(process.env.MONGO_URL).then(()=>{
