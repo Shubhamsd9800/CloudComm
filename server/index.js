@@ -62,6 +62,10 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
 
+app.get("/", (req, res) => {
+  res.send("Hello!");
+});
+
 // ERROR HANDLING MIDDLEWARE
 app.use((err, req, res, next) => {
   console.error(err.stack);
