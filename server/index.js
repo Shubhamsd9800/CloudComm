@@ -32,7 +32,7 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 
 // CORS Configuration
 app.use(cors({
-  origin: "https://cloud-comm.vercel.app", // The origin of your frontend
+  origin: "http://localhost:3000", // The origin of your frontend
   methods: ["GET", "POST", "PATCH", "PUT", "DELETE"], // Allowed methods
   allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
   credentials: true, // Allow credentials
