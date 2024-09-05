@@ -32,7 +32,7 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 
 // CORS Configuration
 app.use(cors({
-  origin: "https://cloud-commm.vercel.app", // The origin of your frontend
+  origin: "https://cloud-comm.vercel.app", // The origin of your frontend
   methods: ["GET", "POST", "PATCH", "PUT", "DELETE"], // Allowed methods
   allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
   credentials: true, // Allow credentials
@@ -54,6 +54,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // ROUTES WITH FILES
+app.get("/",(req,res)=>{
+  res.send("Hello");
+})
 app.post("/auth/register", upload.single("picture"), register);
 app.post("/posts", verifyToken, upload.single("picture"), createPost);
 
@@ -61,10 +64,6 @@ app.post("/posts", verifyToken, upload.single("picture"), createPost);
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
-
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
 
 // ERROR HANDLING MIDDLEWARE
 app.use((err, req, res, next) => {
