@@ -1,11 +1,44 @@
 import Post from "../models/Post.js";
 import User from "../models/User.js";
+import {v2 as cloudinary} from "cloudinary";
+import fs from "fs";
+import dotenv from "dotenv"
+
+dotenv.config();
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
 
 /* CREATE */
-export const createPost = async (req, res,next) => {
+export const createPost = async (req, res, next) => {
   try {
-    const { userId, description, picturePath } = req.body;
+    const { userId, description } = req.body;
     const user = await User.findById(userId);
+    
+    let picturePath = null;
+
+    // Check if a file was uploaded
+    if (req.file) {
+      // Local file path
+      const localFilePath = req.file.path;
+
+      // Upload the picture to Cloudinary in a specific folder
+      const result = await cloudinary.uploader.upload(localFilePath, {
+        folder: "posts", // Specify the Cloudinary folder name
+        public_id: `post_${user.firstName}_${user.lastName}_${Date.now()}`, // Unique identifier for the image
+      });
+
+      // Set the Cloudinary URL as the picture path
+      picturePath = result.secure_url;
+
+      // Delete the local file after uploading to Cloudinary
+      fs.unlinkSync(localFilePath);
+    }
+
+    // Create a new post
     const newPost = new Post({
       userId,
       firstName: user.firstName,
@@ -13,10 +46,11 @@ export const createPost = async (req, res,next) => {
       location: user.location,
       description,
       userPicturePath: user.picturePath,
-      picturePath,
+      picturePath, // Store the Cloudinary URL
       likes: {},
       comments: [],
     });
+
     await newPost.save();
 
     const post = await Post.find();

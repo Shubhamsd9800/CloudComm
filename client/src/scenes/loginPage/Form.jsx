@@ -60,24 +60,36 @@ const Form = () => {
   const register = async (values, onSubmitProps) => {
     const formData = new FormData();
     for (let value in values) {
-      formData.append(value, values[value]);
+      if (value === "picture") {
+        formData.append("picture", values[value]); // Make sure picture is appended properly
+      } else {
+        formData.append(value, values[value]);
+      }
     }
-    formData.append("picturePath", values.picture.name);
-
-    const savedUserResponse = await fetch(
-      "https://cloud-comm-backend.vercel.app/auth/register",
-      {
+  
+    try {
+      const savedUserResponse = await fetch("https://cloud-comm-backend.vercel.app/auth/register", {
         method: "POST",
         body: formData,
+      });
+  
+      if (!savedUserResponse.ok) {
+        // Handle non-200 responses
+        throw new Error("Failed to register user");
       }
-    );
-    const savedUser = await savedUserResponse.json();
-    onSubmitProps.resetForm();
-
-    if (savedUser) {
-      setPageType("login");
+  
+      const savedUser = await savedUserResponse.json();
+      onSubmitProps.resetForm();
+  
+      if (savedUser) {
+        setPageType("login");
+      }
+    } catch (error) {
+      console.error("Error during registration:", error); // Log error for debugging
     }
   };
+  
+
 
   const login = async (values, onSubmitProps) => {
     const loggedInResponse = await fetch("https://cloud-comm-backend.vercel.app/auth/login", {

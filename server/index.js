@@ -17,6 +17,8 @@ import { verifyToken } from "./middleware/auth.js";
 import User from "./models/User.js";
 import Post from "./models/Post.js";
 import { users, posts } from "./data/index.js";
+import {v2 as cloudinary} from "cloudinary";
+
 
 // CONFIGURATIONS
 const __filename = fileURLToPath(import.meta.url);
@@ -29,6 +31,14 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("common"));
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
+
+
+// Configuration
+cloudinary.config({ 
+  cloud_name: process.env.CLOUD_NAME, 
+  api_key:process.env.API_KEY, 
+  api_secret:process.env.API_SECRET // Click 'View API Keys' above to copy your API secret
+});
 
 // CORS Configuration
 app.use(cors({
@@ -48,7 +58,7 @@ const storage = multer.diskStorage({
     cb(null, "public/assets");
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname);
+    cb(null, Date.now() + "-" + file.originalname); // Ensure unique filename
   }
 });
 const upload = multer({ storage });
@@ -57,6 +67,7 @@ const upload = multer({ storage });
 app.get("/",(req,res)=>{
   res.send("Hello");
 })
+
 app.post("/auth/register", upload.single("picture"), register);
 app.post("/posts", verifyToken, upload.single("picture"), createPost);
 

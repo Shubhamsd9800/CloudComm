@@ -10,7 +10,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
 
   const getPosts = async () => {
     try {
-      const response = await fetch("https://cloud-comm-backend.vercel.app/posts", {
+      const response = await fetch("https://cloud-comm-backend.vercel.app/posts/home", {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
