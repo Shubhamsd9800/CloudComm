@@ -59,7 +59,7 @@ Follow these steps to set up the project locally:
 
 3. **Create a `.env` file in the backend directory and add your environment variables:**
     ```plaintext
-    PORT=5000
+    PORT=3001
     MONGO_URI=your_mongodb_uri
     JWT_SECRET=your_jwt_secret
     ```
@@ -73,7 +73,7 @@ Follow these steps to set up the project locally:
 
 Make sure to set the following environment variables in your `.env` file:
 
-- `PORT`: The port number for the backend server (default: 5000).
+- `PORT`: The port number for the backend server (default: 3001).
 - `MONGO_URI`: Your MongoDB connection string.
 - `JWT_SECRET`: Secret key for JWT authentication.
 
@@ -82,7 +82,7 @@ Make sure to set the following environment variables in your `.env` file:
 Once the application is set up and running, you can access it in your browser:
 
 - Open your browser and navigate to `http://localhost:3000` for the frontend.
-- The backend API will be running on `http://localhost:5000`.
+- The backend API will be running on `http://localhost:3001`.
 
 ## Project Structure
 
